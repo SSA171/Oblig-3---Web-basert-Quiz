@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mariadb+mariadbconnector://stud_v23_ssa171:flaskappquiz23@kark.uit.no/stud_v23_ssa171'
 db = SQLAlchemy(app)
+
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -14,7 +15,21 @@ class Question(db.Model):
     option4 = db.Column(db.String(255), nullable=False)
     answer = db.Column(db.String(255), nullable=False)
 
-#db.create_all()
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+
+
+users = {'user': 'password',
+        'admin': 'adminpassword'}
+
+is_user = User(id=1, username='user', password='password')
+is_admin = User(id=2, username='admin', password='adminpassword')
+
+# db.create_all()
+# db.session.add_all([is_user, is_admin])
 
 question1 = Question(text='What is the capital of France?',
                      option1='Berlin',
@@ -50,12 +65,14 @@ question5 = Question(text='What is the highest mountain in the world?',
                      option3='Mount Fuji',
                      option4='Mount McKinley',
                      answer='Mount Everest')
-#db.session.add_all([question1, question2, question3, question4, question5])
-#db.session.commit()
+# db.session.add_all([question1, question2, question3, question4, question5])
+db.session.commit()
+
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('login.html')
+
 
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
@@ -75,29 +92,20 @@ def quiz():
         # Show quiz questions
         questions = Question.query.all()
         return render_template('quiz.html', questions=questions)
-    
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # get the user's login credentials
         username = request.form['username']
         password = request.form['password']
-        # query the database for the user
-        user = User.query.filter_by(username=username).first()
-        if user is None:
-            flash('Invalid username.', 'error')
-        elif not check_password_hash(user.password, password):
-            flash('Invalid password.', 'error')
+        if username in users and users[username] == password:
+            return redirect(url_for('quiz'))
         else:
-            # set the session variables
-            session['logged_in'] = True
-            session['user_id'] = user.id
-            session['username'] = user.username
-            flash('Welcome, {}!'.format(user.username), 'success')
-            return redirect(url_for('home'))
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+    return render_template('home.html')
 
-    return render_template('login.html')
-    
 
 if __name__ == '__main__':
     app.run(debug=True)
