@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz</title>
+</head>
+<body>
+    <h1>Quiz</h1>
+    <form method="POST" action="{{ url_for('quiz') }}">
+        {% for question in questions %}
+        <h2>{{ question.text }}</h2>
+        <input type="checkbox" name="{{ question.id }}" value="{{ question.option1 }}"> {{ question.option1 }}<br>
+        <input type="checkbox" name="{{ question.id }}" value="{{ question.option2 }}"> {{ question.option2 }}<br>
+        <input type="checkbox" name="{{ question.id }}" value="{{ question.option3 }}"> {{ question.option3 }}<br>
+        <input type="checkbox" name="{{ question.id }}" value="{{ question.option4 }}"> {{ question.option4 }}<br>
+        {% endfor %}
+        <input type="submit" value="Next">
+    </form>
+</body>
+</html>
