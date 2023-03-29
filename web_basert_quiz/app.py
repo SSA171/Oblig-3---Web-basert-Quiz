@@ -70,11 +70,6 @@ question5 = Question(text='What is the highest mountain in the world?',
 db.session.commit()
 
 
-@app.route('/')
-def home():
-    return render_template('login.html')
-
-
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
     if request.method == 'POST':
@@ -93,20 +88,6 @@ def quiz():
         # Show quiz questions
         questions = Question.query.all()
         return render_template('quiz.html', questions=questions)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if request.method == 'POST':
-        username = request.form.getlist(str(users.username))
-        password = request.form.getlist(str(users.password))
-        if username in users and users[username] == password:
-            return redirect(url_for('quiz'))
-        else:
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
-    return render_template('home.html', form=form)
 
 
 if __name__ == '__main__':
