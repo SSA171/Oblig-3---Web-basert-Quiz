@@ -1,5 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+from forms import LoginForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mariadb+mariadbconnector://stud_v23_ssa171:flaskappquiz23@kark.uit.no/stud_v23_ssa171'
@@ -23,7 +24,7 @@ class User(db.Model):
 
 
 users = {'user': 'password',
-        'admin': 'adminpassword'}
+         'admin': 'adminpassword'}
 
 is_user = User(id=1, username='user', password='password')
 is_admin = User(id=2, username='admin', password='adminpassword')
@@ -96,15 +97,16 @@ def quiz():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.getlist(str(users.username))
+        password = request.form.getlist(str(users.password))
         if username in users and users[username] == password:
             return redirect(url_for('quiz'))
         else:
             flash('Invalid username or password')
             return redirect(url_for('login'))
-    return render_template('home.html')
+    return render_template('home.html', form=form)
 
 
 if __name__ == '__main__':

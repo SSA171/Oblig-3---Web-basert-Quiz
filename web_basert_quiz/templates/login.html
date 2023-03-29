@@ -15,11 +15,23 @@
     <h1>Login</h1>
     <form action="login.php" method="post" action="quiz.mwb">
       <label for="username"> Username: </label>
-      <input type="text" id="username" name="username" required />
+      <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="username"
+        required
+      />
       <br /><br />
 
       <label for="password"> Password: </label>
-      <input type="password" id="password" name="password" required />
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="password"
+        required
+      />
       <br /><br />
 
       <label for="typeofuser"> Login as: </label>
@@ -29,7 +41,7 @@
       </select>
       <br /><br />
 
-      <a href="{{ url_for('login') }}">Login</a>
+      <button type="submit">Login</button>
     </form>
   </body>
 </html>
