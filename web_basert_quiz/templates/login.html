@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
 {% block body %}
-<form action="login.php" method="post" action="quiz.mwb">
-  <label for="username"> Username: </label>
-  <input type="text" id="username" name="username" required />
-  <br /><br />
-
-  <label for="password"> Password: </label>
-  <input type="password" id="password" name="password" required />
-  <br /><br />
-
-  <label for="typeofuser"> Login as: </label>
-  <select id="typeofuser" name="typeofuser">
-    <option value="user">User</option>
-    <option value="administrator">Administrator</option>
-  </select>
-  <br /><br />
-
-  <a href="{{ url_for('login') }}">Login</a>
-</form>
+<div>
+  <h1>You have to login to proceed further</h1>
+  <form method="POST" action="{{ url_for('login') }}">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br><br>
+    <label for="typeofuser">Login as:</label>
+    <select id="typeofuser" name="typeofuser">
+      <option value="user">User</option>
+      <option value="administrator">Administrator</option>
+    </select>
+    <br><br>
+    <input type="submit" value="Login">
+  </form>
+</div>
 {% endblock %}
