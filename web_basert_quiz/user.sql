@@ -12,6 +12,6 @@ CREATE TABLE `Users` (
   UNIQUE INDEX `id_UNIQUE` (`idUser` ASC) VISIBLE)
 ENGINE = InnoDB;
 
-INSERT INTO `Users` (`idUser`, `username`, `password`, `typeofuser`) VALUES (1, 'user','\'pbkdf2:sha256:260000$V2i99ckU$8b0601a75b4c4b2c2bae10ea9fd1e40756156dc50887a11251c8a7904de43027\'', 'administrator');
-INSERT INTO `Users` (`idUser`, `username`, `password`, `typeofuser`) VALUES (2, 'admin','\'pbkdf2:sha256:260000$V2i99ckU$8b0601a75b4c4b2c2bae10ea9fd1e40756156dc50887a11251c8a7904de43027\'', 'user');
+INSERT INTO `Users` (`idUser`, `username`, `password`, `typeofuser`) VALUES (1, 'user','\'pbkdf2:sha256:260000$V2i99ckU$8b0601a75b4c4b2c2bae10ea9fd1e40756156dc50887a11251c8a7904de43027\'', 'user');
+INSERT INTO `Users` (`idUser`, `username`, `password`, `typeofuser`) VALUES (2, 'admin','\'pbkdf2:sha256:260000$V2i99ckU$8b0601a75b4c4b2c2bae10ea9fd1e40756156dc50887a11251c8a7904de43027\'', 'administrator');
 INSERT INTO `Users` (`idUser`, `username`, `password`, `typeofuser`) VALUES (3, 'yuri','\'pbkdf2:sha256:260000$V2i99ckU$8b0601a75b4c4b2c2bae10ea9fd1e40756156dc50887a11251c8a7904de43027\'', 'administrator');

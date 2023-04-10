@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_user, current_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from user import User
 from userReg import UserReg
+from forms import LoginForm
 
 # Configure the app and login manager
 app = Flask(__name__)
@@ -15,14 +16,12 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(username):
+def load_user(id):
     with UserReg() as db:
-        user_info = db.getUser(username)
-    if user_info:
-        user = User(*user_info)
-        return user
-    else:
-        return None
+        user = db.getId(id)
+    if user:
+        return User(*user[:4])
+    return None
 
 # Define the index route
 
@@ -30,42 +29,41 @@ def load_user(username):
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('login.html', the_title="Login page")
+    return redirect(url_for('login'))
 
 # Define the login route
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        account_type = request.form['typeofuser']
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        account_type = form.typeofuser.data
         with UserReg() as db:
             user = db.getUser(username)
-            passHash = user[2].strip("\'")
-        if user and check_password_hash(passHash, password):
-            user_obj = User(user[0], user[1], passHash, user[3])
-            login_user(user_obj)
-            session['account_type'] = user[3]
-            if account_type == 'administrator' and user[3] == 'administrator':
+            passHash = user[2].strip("'")
+        if user and check_password_hash(passHash, password) and account_type == user[3]:
+            user = User(*user[:4])
+            login_user(user)
+            if current_user.account_type == 'administrator':
                 return redirect(url_for('admin'))
             else:
                 return redirect(url_for('quiz'))
         flash('Invalid username or password')
-    return render_template('login.html', the_title="Login page")
+    return render_template('login.html', the_title='Login page', form=form)
 
 
 @app.route('/admin')
 @login_required
 def admin():
-    if current_user.account_type == 'administrator':
-        return render_template('home.html', the_title="Home page")
-    else:
-        return redirect(url_for('index'))
+    print("Admin page accessed!")
+    return render_template('home.html', the_title="Home page")
 
 
 @app.route('/quiz', methods=['GET', 'POST'])
+@login_required
 def quiz():
     if request.method == 'POST':
         # Evaluate quiz and show results

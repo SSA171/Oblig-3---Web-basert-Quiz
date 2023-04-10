@@ -30,3 +30,13 @@ class UserReg:
                 print(err)
                 result = None
         return result
+    
+    def getId(self, id):
+        try:
+            self.cursor.execute("SELECT * FROM Users WHERE idUser=(%s)", (id,))
+            result = self.cursor.fetchone()
+        except mysql.connector.Error as err:
+                print(err)
+                result = None
+        return result
+    

@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-<h1>hi</h1>
+{% if current_user.is_authenticated %}
+  <h1>Hi {{ current_user.name }}!</h1>
+{% endif %}
 {% endblock %}

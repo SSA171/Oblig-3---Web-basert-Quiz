@@ -52,7 +52,10 @@ class User():
     def is_anonymous(self):
         """False, as anonymous users aren't supported."""
         return False
-        
+    
+    def get_id(self):
+        return self.id
+
     def get(self,username):
         with UserReg() as db:
             user = User(*db.getUser(username))

@@ -4,19 +4,17 @@
 <div>
   <h1>You have to login to proceed further</h1>
   <form method="POST" action="{{ url_for('login') }}">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+    {{ form.csrf_token }}
+    <label for="{{ form.username.id }}">{{ form.username.label }}</label>
+    {{ form.username }}
     <br><br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
+    <label for="{{ form.password.id }}">{{ form.password.label }}</label>
+    {{ form.password(type='password') }}
     <br><br>
-    <label for="typeofuser">Login as:</label>
-    <select id="typeofuser" name="typeofuser">
-      <option value="user">User</option>
-      <option value="administrator">Administrator</option>
-    </select>
+    <label for="{{ form.typeofuser.id }}">{{ form.typeofuser.label }}</label>
+    {{ form.typeofuser }}
     <br><br>
-    <input type="submit" value="Login">
+    {{ form.submit }}
   </form>
 </div>
 {% endblock %}
