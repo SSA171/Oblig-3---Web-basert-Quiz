@@ -60,7 +60,9 @@ def login():
 @app.route('/admin')
 @login_required
 def admin():
-    return render_template('home.html', the_title="Home page")
+    if current_user.account_type == 'administrator':
+        return render_template('home.html', the_title="Home page")
+    return redirect(url_for(index))
 
 
 @app.route('/quiz', methods=['GET', 'POST'])
@@ -69,7 +71,6 @@ def quiz():
     if request.method == 'POST':
         quiz_id = request.form.get('quiz_id')
         if quiz_id is None:
-            flash('Please select a quiz.')
             return redirect(url_for('quiz'))
         return redirect(url_for('do_quiz', quiz_id=quiz_id))
     else:
@@ -83,6 +84,7 @@ def quiz():
 def do_quiz():
     if request.method == 'POST':
         quiz_id = request.args.get('quiz_id')
+        totalt = request.args.get('totalt')
         # Evaluate quiz and show results
         user_answers = request.form.to_dict()
         score = 0
@@ -92,7 +94,7 @@ def do_quiz():
                 answer = db.getOptId(idOpt)
             if answer[3] == 1:
                 score += 1
-        return render_template('home.html', score=score)
+        return render_template('results.html', score=score, totalt=totalt)
     else:
         # Show quiz questions
         with QuizReg() as db:
@@ -100,9 +102,11 @@ def do_quiz():
             questions = db.getQuestionAll(quiz_id)
             quiz_title = db.getQuizId(quiz_id)
             options = {}
+            totalt = 0
             for question in questions:
                 options[question[0]] = db.getOptionsAll(question[0])
-        return render_template('quiz.html', the_title=quiz_title[1], quiz_id=quiz_id, questions=questions, options=options)
+                totalt += 1
+        return render_template('quiz.html', the_title=quiz_title[1], quiz_id=quiz_id, questions=questions, options=options, totalt=totalt)
 
 
 # Define the logout route

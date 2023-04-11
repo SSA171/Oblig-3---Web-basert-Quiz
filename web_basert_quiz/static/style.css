@@ -1,5 +1,5 @@
 body {
-    background: #fff;
+    background: #FFE7CC;
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 0;
@@ -9,21 +9,30 @@ body {
 }
 
 .home {
-    background-color: #eee;
+    background-color: #FFFBEB;
     border: 5px solid;
     position: absolute;
     top: 50%;
     left: 25%;
     right: 25%;
-    transform: translate(0, -50%)
+    transform: translate(0, -50%);
+    border-radius: 0% 0% 0% 0% / 0% 0% 0% 0% ;
+    color: white;
+    box-shadow: 20px 20px rgba(0,0,0,.15);
+    transition: all .4s ease;
 }
 
-form {
+.home:hover {
+    border-radius: 0% 0% 50% 50% / 0% 0% 5% 5% ;
+    box-shadow: 10px 10px rgba(0,0,0,.25);
+  }
+
+  form {
     padding: 15px;
 }
 
 h1 { 
-    color: #7c795d; 
+    color: #7D8F69; 
     font-family: serif; 
     font-size: 45px; 
     font-weight: normal; 
@@ -33,7 +42,7 @@ h1 {
 
 p,
 label {
-    color: #4c4a37;
+    color: #495579;
     font-family: sans-serif;
     font-size: 18px;
     line-height: 32px;
@@ -46,7 +55,7 @@ select {
     border: none;
     border-bottom: 2px solid #ccc;
     font-size: 16px;
-    color: #333;
+    color: #495579;
     background-color: #f7f7f7;
     outline: none;
     transition: border-bottom 0.3s ease;
@@ -56,15 +65,15 @@ select {
 
 input:focus,
 select:focus {
-    border-bottom-color: #76b5c5
+    border-bottom-color: #A0C3D2
 }
 
 input::placeholder {
-    color: #aaa
+    color: #495579
 }
 
 input[type="submit"] {
-    background-color: #76b5c5;
+    background-color: #A0C3D2;
     color: #fff;
     border-radius: 5px;
     cursor: pointer;
@@ -73,8 +82,8 @@ input[type="submit"] {
     width: 75%
 }
 
-input[type="submit"]:hover {
-    background-color: #76b5c5
+input[type="submit"]:hover{
+    background-color: #A0C3D2
 }
 
 select {
@@ -92,9 +101,41 @@ select option {
     font-size: 16px
 }
 
+button {
+  align-items: center;
+  appearance: button;
+  background-color: #A0C3D2;
+  border-radius: 8px;
+  border-style: none;
+  box-shadow: rgba(255, 255, 255, 0.26) 0 1px 2px inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  line-height: 1.15;
+  margin: 20px;
+  padding: 10px 21px;
+  text-align: center;
+  font-size: 16px;
+  width: 50%;
+}
+
+button:active {
+  background-color: #A0C3D2;
+}
+
+button:hover {
+  background-color: #A0C3D2;
+}
+
 .quiz {
-    background-color: #eee;
+    background-color: #FFFBEB;
+    color: white;
+    display: block;
+    width: 50%;
     border: 5px solid;
-    margin: 20px;
-    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
 }
