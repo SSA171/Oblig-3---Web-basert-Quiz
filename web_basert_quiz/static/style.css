@@ -16,28 +16,37 @@ body {
     left: 25%;
     right: 25%;
     transform: translate(0, -50%);
-    border-radius: 0% 0% 0% 0% / 0% 0% 0% 0% ;
+    border-radius: 0% 0% 0% 0% / 0% 0% 0% 0%;
     color: white;
-    box-shadow: 20px 20px rgba(0,0,0,.15);
+    box-shadow: 20px 20px rgba(0, 0, 0, .15);
     transition: all .4s ease;
 }
 
 .home:hover {
-    border-radius: 0% 0% 50% 50% / 0% 0% 5% 5% ;
-    box-shadow: 10px 10px rgba(0,0,0,.25);
-  }
+    border-radius: 0% 0% 50% 50% / 0% 0% 5% 5%;
+    box-shadow: 10px 10px rgba(0, 0, 0, .25);
+}
 
-  form {
+form {
     padding: 15px;
 }
 
-h1 { 
-    color: #7D8F69; 
-    font-family: serif; 
-    font-size: 45px; 
-    font-weight: normal; 
-    line-height: 48px; 
-    margin: 20px; 
+h1 {
+    color: #698269;
+    font-family: serif;
+    font-size: 45px;
+    font-weight: normal;
+    line-height: 48px;
+    margin: 20px;
+}
+
+h2 {
+    color: #7D8F69;
+    font-family: serif;
+    font-size: 32px;
+    font-weight: normal;
+    line-height: 48px;
+    margin: 20px;
 }
 
 p,
@@ -47,6 +56,10 @@ label {
     font-size: 18px;
     line-height: 32px;
     margin: 0 0 24px
+}
+
+input[type='radio'] {
+    accent-color: #7AA874;
 }
 
 input:not([type='radio']),
@@ -79,10 +92,10 @@ input[type="submit"] {
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-top: 10px;
-    width: 75%
+    width: 50%
 }
 
-input[type="submit"]:hover{
+input[type="submit"]:hover {
     background-color: #A0C3D2
 }
 
@@ -102,29 +115,29 @@ select option {
 }
 
 button {
-  align-items: center;
-  appearance: button;
-  background-color: #A0C3D2;
-  border-radius: 8px;
-  border-style: none;
-  box-shadow: rgba(255, 255, 255, 0.26) 0 1px 2px inset;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  line-height: 1.15;
-  margin: 20px;
-  padding: 10px 21px;
-  text-align: center;
-  font-size: 16px;
-  width: 50%;
+    align-items: center;
+    appearance: button;
+    background-color: #A0C3D2;
+    border-radius: 8px;
+    border-style: none;
+    box-shadow: rgba(255, 255, 255, 0.26) 0 1px 2px inset;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    line-height: 1.15;
+    margin: 20px;
+    padding: 10px 21px;
+    text-align: center;
+    font-size: 16px;
+    width: 50%;
 }
 
 button:active {
-  background-color: #A0C3D2;
+    background-color: #A0C3D2;
 }
 
 button:hover {
-  background-color: #A0C3D2;
+    background-color: #A0C3D2;
 }
 
 .quiz {

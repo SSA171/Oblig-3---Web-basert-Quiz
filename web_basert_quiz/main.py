@@ -57,12 +57,26 @@ def login():
     return render_template('login.html', the_title='Login page', form=form)
 
 
-@app.route('/admin')
+@app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
     if current_user.account_type == 'administrator':
-        return render_template('home.html', the_title="Home page")
+        if request.method == 'POST':
+            quiz_id = request.form.get('quiz_id')
+            if quiz_id is None:
+                return redirect(url_for('quiz'))
+            return redirect(url_for('do_admin', quiz_id=quiz_id))
+        else:
+            with QuizReg() as db:
+                quiz_list = db.getAllQuiz()
+        return render_template('quiz_select.html', the_title="Quiz editor", quiz_list=quiz_list)
     return redirect(url_for(index))
+
+
+@app.route('/doadmin')
+@login_required
+def do_admin():
+    return 'edit quiz'
 
 
 @app.route('/quiz', methods=['GET', 'POST'])
