@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div>
+<div class="home">
   <h1>You have to login to proceed further</h1>
   <form method="POST" action="{{ url_for('login') }}">
     {{ form.csrf_token }}

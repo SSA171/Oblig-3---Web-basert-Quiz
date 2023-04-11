@@ -8,7 +8,7 @@ body {
     width: auto
 }
 
-div {
+.home {
     background-color: #eee;
     border: 5px solid;
     position: absolute;
@@ -40,7 +40,7 @@ label {
     margin: 0 0 24px
 }
 
-input,
+input:not([type='radio']),
 select {
     padding: 10px;
     border: none;
@@ -90,4 +90,11 @@ select option {
     background-color: #f7f7f7;
     padding: 10px;
     font-size: 16px
+}
+
+.quiz {
+    background-color: #eee;
+    border: 5px solid;
+    margin: 20px;
+    padding: 10px;
 }

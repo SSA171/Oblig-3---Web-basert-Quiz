@@ -6,5 +6,9 @@ CREATE TABLE `Quiz` (
 ENGINE = InnoDB;
 
 INSERT INTO `Quiz` (`idQuiz`, `title`) VALUES (DEFAULT, 'Country Quiz');
+INSERT INTO `Quiz` (`idQuiz`, `title`) VALUES (DEFAULT, 'Food Quiz');
+INSERT INTO `Quiz` (`idQuiz`, `title`) VALUES (DEFAULT, 'Cat Quiz');
+
+
 
 

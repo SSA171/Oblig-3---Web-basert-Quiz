@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block body %}
+{% if current_user.is_authenticated %}
+<div class="home">
+<h1>Welcome {{ current_user.username }}!</h1>
+<form method="POST" action="{{ url_for('quiz') }}">
+    <label for="quiz_id">Select a Quiz:</label>
+    <select id="quiz_id" name="quiz_id">
+      {% for quiz in quiz_list %}
+        <option value="{{ quiz[0] }}">{{ quiz[1] }}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Start Quiz">
+</form>
+</div>
+{% endif %}
+{% endblock %}

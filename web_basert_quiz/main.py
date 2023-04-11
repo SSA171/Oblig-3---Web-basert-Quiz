@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_user, current_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from user import User
 from userReg import UserReg
+from quizReg import QuizReg
 from forms import LoginForm
 
 # Configure the app and login manager
@@ -22,6 +23,7 @@ def load_user(id):
     if user:
         return User(*user[:4])
     return None
+
 
 # Define the index route
 
@@ -58,7 +60,6 @@ def login():
 @app.route('/admin')
 @login_required
 def admin():
-    print("Admin page accessed!")
     return render_template('home.html', the_title="Home page")
 
 
@@ -66,21 +67,43 @@ def admin():
 @login_required
 def quiz():
     if request.method == 'POST':
+        quiz_id = request.form.get('quiz_id')
+        if quiz_id is None:
+            flash('Please select a quiz.')
+            return redirect(url_for('quiz'))
+        return redirect(url_for('do_quiz', quiz_id=quiz_id))
+    else:
+        with QuizReg() as db:
+            quiz_list = db.getAllQuiz()
+    return render_template('quiz_home.html', the_title="Quiz page", quiz_list=quiz_list)
+
+
+@app.route('/doquiz', methods=['GET', 'POST'])
+@login_required
+def do_quiz():
+    if request.method == 'POST':
+        quiz_id = request.args.get('quiz_id')
         # Evaluate quiz and show results
-        questions = Question.query.all()
+        user_answers = request.form.to_dict()
         score = 0
-        total = 0
-        for question in questions:
-            total += 1
-            selected_options = request.form.getlist(str(question.id))
-            selected_answer = ','.join(selected_options)
-            if selected_answer == question.answer:
+        for key in user_answers:
+            idOpt = user_answers[key]
+            with QuizReg() as db:
+                answer = db.getOptId(idOpt)
+            if answer[3] == 1:
                 score += 1
-        return render_template('results.html', the_title="Results page", score=score, total=total)
+        return render_template('home.html', score=score)
     else:
         # Show quiz questions
-        questions = Question.query.all()
-        return render_template('quiz.html', the_title="Quiz page", questions=questions)
+        with QuizReg() as db:
+            quiz_id = request.args.get('quiz_id')
+            questions = db.getQuestionAll(quiz_id)
+            quiz_title = db.getQuizId(quiz_id)
+            options = {}
+            for question in questions:
+                options[question[0]] = db.getOptionsAll(question[0])
+        return render_template('quiz.html', the_title=quiz_title[1], quiz_id=quiz_id, questions=questions, options=options)
+
 
 # Define the logout route
 
