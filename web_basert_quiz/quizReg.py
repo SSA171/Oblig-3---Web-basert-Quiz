@@ -75,3 +75,21 @@ class QuizReg:
             print(err)
             result = None
         return result
+    
+    def getResultsAll(self, quiz_id):
+        try:
+            self.cursor.execute("SELECT * FROM Results WHERE quiz_id=(%s)", (quiz_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as err:
+            print(err)
+            result = None
+        return result
+    
+    def getUser(self, idUser):
+        try:
+            self.cursor.execute("SELECT username FROM Users WHERE idUser=(%s)", (idUser,))
+            result = self.cursor.fetchone()
+        except mysql.connector.Error as err:
+            print(err)
+            result = None
+        return result

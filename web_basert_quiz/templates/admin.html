@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <h1>{{the_title}}</h1>
+
+  <p><a href = "{{url_for('quiz')}}" > Back to Quiz </a></p>
+
+  <h2>Create New Quiz Question</h2>
+
+<form method = "post" action = "{{ url_for('create_question') }}">
+  {{ form.hidden_tag() }}
+
+  <div class = "form-group">
+    {{ form.question.label }}
+    {{ form.question(class='form-control') }}
+  </div>
+
+  <div class = "form-group">
+    {{ form.category.label }}
+    {{ form.category(class='form-control') }}
+  </div>
+
+  <div class = "form-group">
+    {{ form.option1.label }}
+    {{ form.option1(class='form-control') }}
+  </div>
+
+  <div class = "form-group">
+    {{ form.option2.label }}
+    {{ form.option2(class='form-control') }}
+  </div>
+
+  <div class = "form-group">
+    {{ form.option3.label }}
+    {{ form.option3(class='form-control') }}
+  </div>
+
+  <div class = "form-group">
+    {{ form.option4.label }}
+    {{ form.option4(class='form-control') }}
+  </div>
+
+  <div class = "form-group">
+    {{ form.answer.label }}
+    {{ form.answer(class='form-control') }}
+  </div>
+
+  <div class = "form-group">
+    <input type = "submit" value = "Create Question" class = "btn btn-primary">
+  </div>
+</form>
+{% endblock %}

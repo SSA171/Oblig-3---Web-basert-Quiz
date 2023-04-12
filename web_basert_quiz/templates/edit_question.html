@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class = "home" >
+    <h1>Edit Question</h1>
+    <p>Please select the question you want to edit:</p>
+    <form action = "{{ url_for('edit_question') }}" method = "POST">
+            <select name = "question_id">
+                {% for question in question_list %}
+                    <option value = "{{ question[0] }}" >{{ question[2] }} </option>
+                {% endfor %}
+            </select>
+        <input type = "submit" value = 'Edit Question'></input>
+    </form>
+</div>
+{% endblock %}

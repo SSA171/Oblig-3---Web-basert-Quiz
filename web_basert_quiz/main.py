@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from user import User
 from userReg import UserReg
 from quizReg import QuizReg
-from forms import LoginForm
+from forms import LoginForm, QuestionForm
 
 # Configure the app and login manager
 app = Flask(__name__)
@@ -14,7 +14,6 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 # Define the User Loader function for Flask-Login
-
 
 @login_manager.user_loader
 def load_user(id):
@@ -27,14 +26,12 @@ def load_user(id):
 
 # Define the index route
 
-
 @app.route('/')
 @app.route('/index')
 def index():
     return redirect(url_for('login'))
 
 # Define the login route
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -43,9 +40,11 @@ def login():
         username = form.username.data
         password = form.password.data
         account_type = form.typeofuser.data
+
         with UserReg() as db:
             user = db.getUser(username)
             passHash = user[2].strip("'")
+
         if user and check_password_hash(passHash, password) and account_type == user[3]:
             user = User(*user[:4])
             login_user(user)
@@ -56,7 +55,6 @@ def login():
         flash('Invalid username or password')
     return render_template('login.html', the_title='Login page', form=form)
 
-
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
@@ -64,19 +62,116 @@ def admin():
         if request.method == 'POST':
             quiz_id = request.form.get('quiz_id')
             if quiz_id is None:
-                return redirect(url_for('quiz'))
-            return redirect(url_for('do_admin', quiz_id=quiz_id))
-        else:
-            with QuizReg() as db:
-                quiz_list = db.getAllQuiz()
-        return render_template('quiz_select.html', the_title="Quiz editor", quiz_list=quiz_list)
+                return redirect(url_for('admin'))
+            return redirect(url_for('admin_dashboard', quiz_id=quiz_id))
+        
+        with QuizReg() as db:
+            quiz_list = db.getAllQuiz()
+        return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list)
+    return redirect(url_for(index))
+
+@app.route('/admin/dashboard', methods=['GET', 'POST'])
+@login_required
+def admin_dashboard():
+    if current_user.account_type == 'administrator':
+        quiz_id = request.args.get('quiz_id')
+        if request.method == 'POST':
+            quiz_tool = request.form.get('quiz_tool')
+            if quiz_tool is None:
+                return redirect(url_for('admin_dashboard'))
+            elif quiz_tool == '1':
+                return redirect(url_for('edit_question', quiz_id=quiz_id))
+            elif quiz_tool == '2':
+                return redirect(url_for('see_question', quiz_id=quiz_id))
+            elif quiz_tool == '2':
+                return redirect(url_for('add_question', quiz_id=quiz_id))
+            else:
+                return redirect(url_for('result_question', quiz_id=quiz_id))
+        return render_template('admin_quiz_dash.html', the_title="Quiz Tool page", quiz_id = quiz_id)
     return redirect(url_for(index))
 
 
-@app.route('/doadmin')
+@app.route('/edit_question', methods=['GET', 'POST'])
 @login_required
-def do_admin():
-    return 'edit quiz'
+def edit_question():
+    if current_user.account_type == 'administrator':
+        with QuizReg() as db:
+            quiz_id = request.args.get('quiz_id')
+            question_list = db.getQuestionAll(quiz_id)
+        if request.method == 'POST':
+            question_id = request.form['question_id']
+            return redirect(url_for('edit_question_question', question_id = question_id))
+        return render_template('edit_question.html', the_title='Question selection page', question_list=question_list)
+    return redirect(url_for('index'))
+
+
+@app.route('/edit_question/question', methods=['GET', 'POST'])
+@login_required
+def edit_question_question():
+    if current_user.account_type != 'administrator':
+        return redirect(url_for('index'))
+    question_id = request.args.get('question_id')
+    if request.method == 'POST':
+        question_tool = request.form['question_tool']
+        return redirect(url_for())
+    return render_template('edit_question_tool.html', the_title='Question tool page', question_id = question_id)
+
+
+@app.route('/create_question', methods=['GET', 'POST'])
+@login_required
+def create_question():
+    if current_user.account_type != 'administrator':
+        return redirect(url_for('quiz'))
+
+    if request.method == 'POST':
+        # Get data from form
+        quiz_id = request.form['quiz_id']
+        category = request.form['category']
+        question_text = request.form['question_text']
+        option1 = request.form['option1']
+        option2 = request.form['option2']
+        option3 = request.form['option3']
+        option4 = request.form['option4']
+        correct_option = request.form['correct_option']
+
+        # Insert question into database
+        with QuizReg() as db:
+            db.createQuestion(quiz_id, category, question_text)
+            question_id = db.getLastQuestionId()
+            db.createOption(question_id, option1)
+            db.createOption(question_id, option2)
+            db.createOption(question_id, option3)
+            db.createOption(question_id, option4)
+            db.setCorrectOption(question_id, correct_option)
+
+        flash('Question created successfully.')
+        return redirect(url_for('create_question'))
+
+    else:
+        with QuizReg() as db:
+            quiz_list = db.getAllQuiz()
+
+        return render_template('create_question.html', the_title = 'Create Question', quiz_list = quiz_list)
+
+
+@app.route('/result_question', methods=['GET','POST'])
+@login_required
+def result_question():
+    if current_user.account_type != 'administrator':
+        return redirect(url_for('index'))
+    
+    with QuizReg() as db:
+        quiz_id = request.args.get('quiz_id')
+        results = db.getResultsAll(quiz_id)
+        results_list = [list(row) for row in results]
+        for result in results_list:
+            user_id = result[1]
+            username = db.getUser(user_id)
+            result[1] = username[0] if username else None
+        results = tuple(tuple(row) for row in results_list)
+
+    return render_template('admin_results.html', the_title='Quiz results page', results = results)
+    
 
 
 @app.route('/quiz', methods=['GET', 'POST'])
@@ -102,6 +197,7 @@ def do_quiz():
         # Evaluate quiz and show results
         user_answers = request.form.to_dict()
         score = 0
+        
         for key in user_answers:
             idOpt = user_answers[key]
             with QuizReg() as db:
@@ -109,6 +205,7 @@ def do_quiz():
             if answer[3] == 1:
                 score += 1
         return render_template('results.html', score=score, totalt=totalt)
+    
     else:
         # Show quiz questions
         with QuizReg() as db:
@@ -121,10 +218,9 @@ def do_quiz():
                 options[question[0]] = db.getOptionsAll(question[0])
                 totalt += 1
         return render_template('quiz.html', the_title=quiz_title[1], quiz_id=quiz_id, questions=questions, options=options, totalt=totalt)
-
+    
 
 # Define the logout route
-
 
 @app.route('/logout')
 @login_required
