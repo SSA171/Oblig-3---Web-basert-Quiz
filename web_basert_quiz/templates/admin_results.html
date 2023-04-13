@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 
 {% block body %}
-  <h1>Quiz Results</h1>
-  <table class="table">
+  <h1>{{the_title}} results</h1>
+  <div class = "result">
+  <div class="tbl-header">
+  <table>
     <thead>
       <tr>
         <th> Username </th>
@@ -11,15 +13,21 @@
         <th> Total Questions </th>
       </tr>
     </thead>
+  </table>
+  <div class="tbl-content">
+    <table>
     <tbody>
       {% for result in results %}
         <tr>
-          <td> {{ result[1] }} </td>
-          <td> {{result[2] }} </td>
+          <td> {{ username }} </td>
+          <td> {{ the_title }} </td>
           <td> {{ result[3] }} </td>
           <td> {{ result[4] }} </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
+  </div>
+  </div>
 {% endblock %}

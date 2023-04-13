@@ -1,1 +1,1 @@
-user_id = results[1]
+quiz_id

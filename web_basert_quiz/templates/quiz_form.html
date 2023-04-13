@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block body %}
+{% if current_user.is_authenticated %}
+<div class="quiz">
+  <h1>Edit Quiz {{ quiz_id }}</h1>
+  <ul>
+    {% for question in questions %}
+    <li>
+      <p>{{ question.question }}</p>
+      <form method="POST" action="{{ url_for('edit_question', quiz_id=quiz_id, question_id=question.id) }}">
+        {{ form.csrf_token }}
+        {{ form.question.label }} {{ form.question() }}
+        {{ form.category.label }} {{ form.category() }}
+        {{ form.option1.label }} {{ form.option1() }}
+        {{ form.option2.label }} {{ form.option2() }}
+        {{ form.option3.label }} {{ form.option3() }}
+        {{ form.option4.label }} {{ form.option4() }}
+        {{ form.answer.label }} {{ form.answer() }}
+        <input type="submit" value="Save">
+      </form>
+      <form method="POST" action="{{ url_for('delete_question', quiz_id=quiz_id, question_id=question.id) }}">
+        {{ form.csrf_token }}
+        <input type="submit" value="Delete">
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}

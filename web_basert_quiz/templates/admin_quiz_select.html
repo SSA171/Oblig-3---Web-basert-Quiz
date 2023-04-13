@@ -3,8 +3,9 @@
 {% if current_user.is_authenticated %}
 <div class="home">
 <h1>Welcome {{ current_user.username }}!</h1>
+<h2> Select a quiz you want to progess with</h2>
 <form method="POST" action="{{ url_for('admin') }}">
-    <label for="quiz_id">Select a Quiz:</label>
+    <label for="quiz_id">Select a quiz: </label>
     <select id="quiz_id" name="quiz_id">
       {% for quiz in quiz_list %}
         <option value="{{ quiz[0] }}">{{ quiz[1] }}</option>

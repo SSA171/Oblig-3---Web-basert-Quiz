@@ -21,4 +21,3 @@ CREATE TABLE `Results` (
     ON UPDATE NO ACTION)
 
 ENGINE = InnoDB
-

@@ -8,6 +8,10 @@ body {
     width: auto
 }
 
+div {
+    margin: 20px;
+}
+
 .home {
     background-color: #FFFBEB;
     border: 5px solid;
@@ -152,3 +156,49 @@ button:hover {
     margin-bottom: 20px;
     padding: 15px;
 }
+
+
+.result {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 60px;
+}
+
+table
+{   
+    width:100%;
+    table-layout: fixed;
+    color: #495579;
+  }
+
+  .tbl-header{
+    background-color: #FFFBEB;
+    border: 5px solid white;
+   }
+
+  .tbl-content{
+    background-color: #FFFBEB;
+    overflow-x:auto;
+    margin-top: 0px;
+    border-top: 5px solid white;
+  }
+
+  th
+  {
+    padding: 20px 15px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 20px;
+    text-transform: uppercase;
+  }
+
+  td
+  {
+    padding: 15px;
+    text-align: center;
+    vertical-align:middle;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  

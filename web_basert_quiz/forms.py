@@ -9,10 +9,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class QuestionForm(FlaskForm):
-    question = TextAreaField('Question', validators=[DataRequired()])
-    category = SelectField('Category', validators=[DataRequired()], choices=[('Geography', 'Geography'), ('History', 'History'), ('Science', 'Science'), ('Mathematics', 'Mathematics')])
-    option1 = StringField('Option 1', validators=[DataRequired()])
-    option2 = StringField('Option 2', validators=[DataRequired()])
-    option3 = StringField('Option 3', validators=[DataRequired()])
-    option4 = StringField('Option 4', validators=[DataRequired()])
-    answer = SelectField('Answer', validators=[DataRequired()], choices=[('option1', 'Option 1'), ('option2', 'Option 2'), ('option3', 'Option 3'), ('option4', 'Option 4')])
+    question = StringField('Question', validators=[DataRequired()])
+    category = SelectField('Login as', choices=[('math', 'Math'), ('science', 'Science'), ('music','Music'), ('others', 'Others')], validators=[DataRequired()])
+    submit = SubmitField('Edit question')
+    

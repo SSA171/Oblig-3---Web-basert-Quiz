@@ -2,6 +2,7 @@ CREATE TABLE `Questions` (
   `idQuest` INT NOT NULL AUTO_INCREMENT,
   `quiz_id` INT NOT NULL,
   `question_text` TEXT NOT NULL,
+  `category` TEXT NOT NULL DEFAULT 'diverse',
   PRIMARY KEY (`idQuest`, `quiz_id`),
   UNIQUE INDEX `id_UNIQUE` (`idQuest` ASC) VISIBLE,
   INDEX `quizID_idx` (`quiz_id` ASC) VISIBLE,
