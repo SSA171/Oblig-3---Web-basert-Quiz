@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block body %}
+{% if current_user.is_authenticated %}
+<div class="quiz">
+    <h1>{{ the_title }}</h1>
+    <h2>Questions:</h2>
+    <form method="POST" action="{{ url_for('update', quiz_id=quiz_id) }}">
+        {{ questionForm.csrf_token }}
+        {{ optionForm.csrf_token }}
+        {% for question in questions %}
+        <div class="tbl-header">
+            <input type="hidden" name="{{ questionForm.idQuest.name }}" value="{{ question[0] }}">
+            <input type="hidden" name="{{ questionForm.quiz_id.name }}" value="{{ question[1] }}">
+            <div>
+                <label>Question {{ loop.index }}:</label>
+                <br><br>
+                <input type="text" name="{{ questionForm.question_text.name }}" value="{{ question[2] }}">
+            </div>
+            <div>
+                <label>Category:</label>
+                <br><br>
+                <input type="text" name="{{ questionForm.category.name }}" value="{{ question[3] }}">
+            </div>
+            {% for option in options[question[0]] %}
+            <div>
+                <input type="hidden" id="idOpt" name="{{ optionForm.idOpt.name }}" value="{{ option[0] }}">
+                <label>Option {{ loop.index }}:</label>
+                <br><br>
+                <input type="checkbox" name="{{ optionForm.is_correct.name }}" value="{{ option[3] }}" {% if
+                    option[3]==1 %}checked{% endif %}>
+                <input type="text" name="{{ optionForm.option_text.name }}" value="{{ option[2] }}">
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        {{ questionForm.submit }}
+    </form>
+</div>
+{% endif %}
+{% endblock %}

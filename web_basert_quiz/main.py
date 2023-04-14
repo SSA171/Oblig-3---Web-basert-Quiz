@@ -1,15 +1,17 @@
 # Import required modules
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_login import LoginManager, login_user, current_user, login_required
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import check_password_hash, generate_password_hash
 from user import User
 from userReg import UserReg
 from quizReg import QuizReg
-from forms import LoginForm, QuestionForm
+from forms import LoginForm, QuestionForm, OptionForm
 
 # Configure the app and login manager
 app = Flask(__name__)
 app.secret_key = 'mysecretkey'
+csrf = CSRFProtect(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -59,6 +61,7 @@ def login():
 @login_required
 def admin():
     if current_user.account_type == 'administrator':
+        form = QuestionForm()
         if request.method == 'POST':
             quiz_id = request.form.get('quiz_id')
             if quiz_id is None:
@@ -67,7 +70,7 @@ def admin():
         
         with QuizReg() as db:
             quiz_list = db.getAllQuiz()
-        return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list)
+        return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list,form=form)
     return redirect(url_for(index))
 
 @app.route('/admin/tool', methods=['GET', 'POST'])
@@ -77,81 +80,57 @@ def admin_tool():
         return redirect(url_for(index))
     
     quiz_id = request.args.get('quiz_id')
+    form = QuestionForm()
     if request.method == 'POST':
         quiz_tool = request.form.get('quiz_tool')
         if quiz_tool is None:
             return redirect(url_for('admin_tool', quiz_id=quiz_id))
         elif quiz_tool == 'edit':
-            return redirect(url_for('edit_question', quiz_id=quiz_id))
+            return redirect(url_for('update', quiz_id=quiz_id, ))
         else:
             return redirect(url_for('result_quiz', quiz_id=quiz_id))
-    return render_template('admin_quiz_tool.html', the_title="Quiz Tool page", quiz_id = quiz_id)
+    return render_template('admin_quiz_tool.html', the_title="Quiz Tool page", quiz_id = quiz_id, form = form)
 
-@app.route('/edit_question', methods=['GET', 'POST'])
+@app.route('/update', methods=['GET', 'POST'])
 @login_required
-def edit_question():
+def update():
     if current_user.account_type != 'administrator':
         return redirect(url_for('index'))
 
     quiz_id = request.args.get('quiz_id')
-    form = QuestionForm()
+    questionForm = QuestionForm()
+    optionForm = OptionForm()
     with QuizReg() as db:
         questions = db.getQuestionAll(quiz_id)
-    if request.method == 'POST':
+        options = {}
         for question in questions:
-            question_id = question[0]
-            question_text = request.form.get(f'question{question_id}')
-            idQuest = question_id
-    return render_template('quiz_editor.html', questions=questions, form=form, quiz_id=quiz_id)
-
-@app.route('/edit_options', methods=['GET', 'POST'])
-@login_required
-def edit_options():
-    if current_user.account_type != 'administrator':
-        return redirect(url_for('index'))
-
-    idQuest = request.args.get('idQuest')
-    with QuizReg() as db:
-        options = db.getOptionsAll(idQuest)
-        print(options)
-    return render_template('option_editor.html', options=options, idQuest = idQuest)
-
-
-@app.route('/create_question', methods=['GET', 'POST'])
-@login_required
-def create_question():
-    if current_user.account_type != 'administrator':
-        return redirect(url_for('quiz'))
+            idQuest = question[0]
+            options[idQuest] = db.getOptionsAll(idQuest)
 
     if request.method == 'POST':
-        # Get data from form
-        quiz_id = request.form['quiz_id']
-        category = request.form['category']
-        question_text = request.form['question_text']
-        option1 = request.form['option1']
-        option2 = request.form['option2']
-        option3 = request.form['option3']
-        option4 = request.form['option4']
-        correct_option = request.form['correct_option']
+        question_changes = []
+        option_changes = []
+        for question in questions:
+            question_id = request.form.get(f"idQuest_{question[0]}")
+            question_text = request.form.get(f"question_text_{question[0]}")
+            category = request.form.get(f"category_{question[0]}")
+            if question_text != question[2] or category != question[3]:
+                question_changes.append((question_id, question[2], question_text, question[3], category))
+                #db.updateQuestion(question_id, question_text, category)
+            for option in options[question[0]]:
+                option_id = option[0]
+                option_text = request.form.get(f"option_text_{option_id}")
+                is_correct = request.form.get(f"is_correct_{option_id}")
+                if option_text != option[2] or is_correct != option[3]:
+                    option_changes.append((option_id, option[2], option_text, option[3], is_correct))
+                    #db.updateOption(option_id, option_text, is_correct)
 
-        # Insert question into database
-        with QuizReg() as db:
-            db.createQuestion(quiz_id, category, question_text)
-            question_id = db.getLastQuestionId()
-            db.createOption(question_id, option1)
-            db.createOption(question_id, option2)
-            db.createOption(question_id, option3)
-            db.createOption(question_id, option4)
-            db.setCorrectOption(question_id, correct_option)
+        print(f"Question changes: {question_changes}")
+        print(f"Option changes: {option_changes}")
 
-        flash('Question created successfully.')
-        return redirect(url_for('create_question'))
+    return render_template('admin_quiz.html', the_title='Quiz update', questions=questions, options=options, questionForm=questionForm, optionForm=optionForm, quiz_id=quiz_id)
 
-    else:
-        with QuizReg() as db:
-            quiz_list = db.getAllQuiz()
 
-        return render_template('create_question.html', the_title = 'Create Question', quiz_list = quiz_list)
 
 
 @app.route('/result_question', methods=['GET','POST'])

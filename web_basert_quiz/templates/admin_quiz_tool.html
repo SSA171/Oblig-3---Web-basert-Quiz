@@ -3,14 +3,15 @@
 {% if current_user.is_authenticated %}
 <div class="home">
     <h1> {{ current_user.username }}!</h1>
-<form method="POST" action="{{ url_for('admin_tool', quiz_id = quiz_id) }}">
-    <label for="quiz_tool">Select what you want to do:</label>
-    <select id="quiz_tool" name="quiz_tool">
-        <option value= 'edit'>Edit quiz</option>
-        <option value= 'result'>See results</option>
-    </select>
-    <input type="submit" value="Select tool">
-</form>
+    <form method="POST" action="{{ url_for('admin_tool', quiz_id = quiz_id) }}">
+        {{ form.csrf_token }}
+        <label for="quiz_tool">Select what you want to do:</label>
+        <select id="quiz_tool" name="quiz_tool">
+            <option value='edit'>Edit quiz</option>
+            <option value='result'>See results</option>
+        </select>
+        <input type="submit" value="Select tool">
+    </form>
 </div>
 {% endif %}
 {% endblock %}

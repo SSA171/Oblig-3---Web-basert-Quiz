@@ -20,4 +20,8 @@ CREATE TABLE `Results` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 
-ENGINE = InnoDB
+ENGINE = InnoDB;
+
+INSERT INTO `Results` (`user_id`, `quiz_id`, `correct_answers`, `total_questions`) VALUES (1, 1, 2, 6);
+INSERT INTO `Results` (`user_id`, `quiz_id`, `correct_answers`, `total_questions`) VALUES (1, 1, 5, 6);
+INSERT INTO `Results` (`user_id`, `quiz_id`, `correct_answers`, `total_questions`) VALUES (1, 1, 6, 6);

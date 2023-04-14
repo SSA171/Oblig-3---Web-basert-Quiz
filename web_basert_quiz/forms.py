@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, TextAreaField
+from wtforms import StringField, SubmitField, SelectField, TextAreaField, HiddenField, BooleanField,validators,FieldList,FormField
 from wtforms.validators import DataRequired
 
 class LoginForm(FlaskForm):
@@ -9,7 +9,14 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class QuestionForm(FlaskForm):
-    question = StringField('Question', validators=[DataRequired()])
-    category = SelectField('Login as', choices=[('math', 'Math'), ('science', 'Science'), ('music','Music'), ('others', 'Others')], validators=[DataRequired()])
-    submit = SubmitField('Edit question')
-    
+    idQuest = HiddenField('idQuest')
+    quiz_id = HiddenField('quiz_id')
+    question_text = StringField('Question Text', validators=[DataRequired()])
+    category = StringField('Category', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
+class OptionForm(FlaskForm):
+    idOpt = HiddenField('idOpt')
+    option_text = StringField('Option Text', validators=[DataRequired()])
+    is_correct = BooleanField('Is Correct?')
+    submit = SubmitField('Update')

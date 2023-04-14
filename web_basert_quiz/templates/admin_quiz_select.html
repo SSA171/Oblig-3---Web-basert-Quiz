@@ -5,6 +5,7 @@
 <h1>Welcome {{ current_user.username }}!</h1>
 <h2> Select a quiz you want to progess with</h2>
 <form method="POST" action="{{ url_for('admin') }}">
+    {{ form.csrf_token }}
     <label for="quiz_id">Select a quiz: </label>
     <select id="quiz_id" name="quiz_id">
       {% for quiz in quiz_list %}
