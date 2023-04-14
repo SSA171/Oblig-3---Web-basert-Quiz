@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="home">
+    <h1>{{the_title}}</h1>
+    <h2>Enter the title of your quiz: </h2>
+    <form method="POST" action="{{ url_for('quiz_add', quiz_id = quiz_id) }}">
+        {{ form.csrf_token }}
+        <input type="hidden" name="{{ form.idQuiz.name }}" value="{{ idQuiz }}">
+        <div>
+            {{ form.title }}
+        </div>
+        <input type="submit" value="Create">
+    </form>
+</div>
+{% endblock %}

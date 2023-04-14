@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from user import User
 from userReg import UserReg
 from quizReg import QuizReg
-from forms import LoginForm, QuestionForm, OptionForm
+from forms import LoginForm, QuestionForm, OptionForm, QuizForm
 
 # Configure the app and login manager
 app = Flask(__name__)
@@ -90,10 +90,29 @@ def admin_tool():
         if quiz_tool is None:
             return redirect(url_for('admin_tool', quiz_id=quiz_id))
         elif quiz_tool == 'edit':
-            return redirect(url_for('update', quiz_id=quiz_id, ))
+            return redirect(url_for('update', quiz_id=quiz_id))
+        elif quiz_tool == 'delete':
+            return redirect(url_for('delete', quiz_id=quiz_id))
         else:
             return redirect(url_for('result_question', quiz_id=quiz_id))
     return render_template('admin_quiz_tool.html', the_title="Quiz Tool page", quiz_id=quiz_id, form=form)
+
+
+@app.route('/quiz_add', methods=['GET', 'POST'])
+@login_required
+def quiz_add():
+    if current_user.account_type != 'administrator':
+        return redirect(url_for('index'))
+
+    quiz_id = request.args.get('quiz_id')
+    form = QuizForm()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        title = request.form.get('title')
+        with QuizReg() as db:
+            db.addQuiz(title)
+        return redirect(url_for('quiz_add', quiz_id=quiz_id))
+    return render_template('admin_quiz_add.html', the_title='Create new quiz', form=form, quiz_id=quiz_id)
 
 
 @app.route('/update', methods=['GET', 'POST'])
@@ -134,12 +153,12 @@ def update():
             option = {
                 'idOpt': idOpt[i],
                 'option_text': option_text[i],
-                # må debugge denne delen ettersom den blir ikke oppdatert
-                # sjekk print statement i for option_data in question_data
                 'is_correct': int(idOpt[i] in is_correct)
             }
             data[question_id]['options'].append(option)
+
         with QuizReg() as db:
+
             for question_id, question_data in data.items():
                 db.updateQuestion(
                     question_id=question_id,
@@ -148,13 +167,13 @@ def update():
                     category=question_data['category']
                 )
                 for option_data in question_data['options']:
-                    print(option_data['is_correct'])
                     db.updateOption(
                         option_id=option_data['idOpt'],
                         quest_id=question_id,
                         option_text=option_data['option_text'],
                         is_correct=option_data['is_correct']
                     )
+        return redirect(url_for('update', quiz_id=quiz_id))
     return render_template('admin_quiz.html', the_title='Quiz update', questions=questions, options=options, questionForm=questionForm, optionForm=optionForm, quiz_id=quiz_id)
 
 
@@ -176,6 +195,27 @@ def add():
 
         return redirect(url_for('add_options', quiz_id=quiz_id, total_options=total_options))
     return render_template('admin_add.html', the_title='Add questions', form=form, quiz_id=quiz_id)
+
+
+@app.route('/delete', methods=['GET', 'POST'])
+@login_required
+def delete():
+    if current_user.account_type != 'administrator':
+        return redirect(url_for(index))
+
+    form = QuestionForm()
+    quiz_id = request.args.get('quiz_id')
+    with QuizReg() as db:
+        questions = db.getQuestionAll(quiz_id)
+
+    if request.method == 'POST':
+        idQuest = request.form.get('idQuest')
+        if quiz_id is None:
+            return redirect(url_for('delete'))
+        with QuizReg() as db:
+            db.deleteQuestion(idQuest)
+            questions = db.getQuestionAll(quiz_id)
+    return render_template('admin_delete.html', the_title="Question delete page", questions=questions, form=form)
 
 
 @app.route('/add_options', methods=['GET', 'POST'])

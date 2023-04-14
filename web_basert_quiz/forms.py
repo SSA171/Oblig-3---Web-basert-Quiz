@@ -8,6 +8,9 @@ class LoginForm(FlaskForm):
     typeofuser = SelectField('Login as', choices=[('user', 'User'), ('administrator', 'Administrator')], validators=[DataRequired()])
     submit = SubmitField('Login')
 
+class QuizForm(FlaskForm):
+    idQuiz = HiddenField('idQuiz')
+    title = StringField('title', validators=[DataRequired()])
 class QuestionForm(FlaskForm):
     idQuest = HiddenField('idQuest')
     quiz_id = HiddenField('quiz_id')

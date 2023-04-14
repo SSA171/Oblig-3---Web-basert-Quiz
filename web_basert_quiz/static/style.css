@@ -105,10 +105,6 @@ input[type="submit"]:hover {
     background-color: #A0C3D2
 }
 
-.full {
-    width: 100%;
-}
-
 select {
     appearance: none;
     -webkit-appearance: none;
@@ -243,3 +239,9 @@ input[type='checkbox']:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+a {
+    text-decoration: none;
+    color: inherit;
+  }
+  

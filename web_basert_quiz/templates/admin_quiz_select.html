@@ -6,7 +6,6 @@
 <h2> Select a quiz you want to progess with</h2>
 <form method="POST" action="{{ url_for('admin') }}">
     {{ form.csrf_token }}
-    <label for="quiz_id">Select a quiz: </label>
     <select id="quiz_id" name="quiz_id">
       {% for quiz in quiz_list %}
         <option value="{{ quiz[0] }}">{{ quiz[1] }}</option>
@@ -14,6 +13,11 @@
     </select>
     <input type="submit" value="Select quiz">
 </form>
+<a href="{{ url_for('quiz_add', quiz_id=quiz_id) }}">
+  <button>
+      Add new quiz
+  </button>
+  </a>
 </div>
 {% endif %}
 {% endblock %}

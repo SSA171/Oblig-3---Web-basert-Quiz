@@ -27,18 +27,22 @@
                 <input type="hidden" name="{{ optionForm.idOpt.name }}" value="{{ option[0] }}">
                 <input type="hidden" name="{{ optionForm.quest_id.name }}" value="{{ option[1] }}">
                 <label>Option {{ loop.index }}:</label>
-                <br><br>
                 <input type="checkbox" name="{{ optionForm.is_correct.name }}" value="{{ option[0] }}" {% if option[3] %}checked{% endif %}>
                 <input type="text" name="{{ optionForm.option_text.name }}" value="{{ option[2] }}">
             </div>
+            {% if loop.last %}
+            <input type="hidden" name="{{ questionForm.total_options.name }}" value="{{ loop.index }}">
+            {% endif %}
             {% endfor %}
         </div>
         {% endfor %}
         {{ questionForm.submit }}
     </form>
+    <a href="{{ url_for('add', quiz_id=quiz_id) }}">
     <button>
-        <a href="{{ url_for('add', quiz_id=quiz_id) }}">Add question</a>
+        Add question
     </button>
+    </a>
 </div>
 {% endif %}
 {% endblock %}

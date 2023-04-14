@@ -103,8 +103,18 @@ class QuizReg:
             print("Quiz result added successfully")
         except mysql.connector.Error as err:
             self.conn.rollback()
-            print("Error adding quiz result:", err)
+            print(err)
     
+    def addQuiz(self,title):
+        try:
+            sql1 = "INSERT INTO Quiz (title) VALUES (%s)"
+            values = (title,)
+            self.cursor.execute(sql1, values)
+            self.conn.commit()
+            print("New quiz added successfully")
+        except mysql.connector.Error as err:
+            self.conn.rollback()
+            print(err)
     
     def addQuestion(self,quiz_id, question_text, category):
         try:
@@ -115,7 +125,7 @@ class QuizReg:
             print("Question added successfully")
         except mysql.connector.Error as err:
             self.conn.rollback()
-            print("Error adding question into Quiz:", err)
+            print(err)
 
     def addOptions(self,quest_id, option_text, is_correct):
         try:
@@ -126,8 +136,7 @@ class QuizReg:
             print("Question added successfully")
         except mysql.connector.Error as err:
             self.conn.rollback()
-            print("Error adding question into Quiz:", err)
-
+            print(err)
 
     def updateQuestion(self, question_id,quiz_id, question_text, category):
         try:
@@ -154,5 +163,19 @@ class QuizReg:
         
         except mysql.connector.Error as err:
             self.conn.rollback()
-            print("Error updating question:", err)
+            print(err)
 
+    def deleteQuestion(self, idQuest):
+        try:
+            self.deleteOption(idQuest)
+            self.cursor.execute("DELETE FROM Questions WHERE  idQuest=(%s)", (idQuest,))
+            print('Question deleted successfully')
+        except mysql.connector.Error as err:
+                print(err)
+    
+    def deleteOption(self, quest_id):
+        try:
+            self.cursor.execute("DELETE FROM Options WHERE  quest_id=(%s)", (quest_id,))
+            print('Options deleted successfully')
+        except mysql.connector.Error as err:
+                print(err)
