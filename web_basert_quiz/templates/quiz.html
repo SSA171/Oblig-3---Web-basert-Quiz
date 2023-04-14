@@ -2,6 +2,7 @@
 {% block body %}
 <h1>{{ the_title }}</h1>
 <form method="post" action="{{ url_for('do_quiz', quiz_id=quiz_id, totalt=totalt) }}">
+  {{ form.csrf_token }}
   {% for question in questions %}
   <div id="question{{ question[0] }}" class="quiz">
     <label>{{ question[2] }}</label>

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="quiz">
+  <h1>{{the_title}}</h1>
+
+  <h2>Create New Quiz Question</h2>
+  <form method="POST" action="{{ url_for('add', quiz_id = quiz_id) }}">
+    {{ form.csrf_token }}
+    <input type="hidden" name="{{ form.idQuest.name }}" value="{{ idQuest }}">
+    <input type="hidden" name="{{ form.quiz_id.name }}" value="{{ quiz_id }}">
+
+    <div>
+      {{ form.question_text.label }}
+      {{ form.question_text }}
+    </div>
+
+    <div>
+      {{ form.category.label }}
+      {{ form.category }}
+    </div>
+
+    <div>
+      <label>The amount of options: </label>
+      <br><br>
+      <input type="text" name="total_options">
+    </div>
+    <input type="submit" value="Add question">
+  </form>
+</div>
+{% endblock %}

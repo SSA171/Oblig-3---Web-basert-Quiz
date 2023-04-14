@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="quiz">
+    <h1>{{the_title}}</h1>
+    <form method="POST" action="{{ url_for('add_options', quiz_id = quiz_id, total_options = total_options) }}">
+        {{ form.csrf_token }}
+        <input type="hidden" name="{{ form.quest_id.name }}" value="{{ quest_id }}">
+
+        {% for i in range(total_options) %}
+        <input type="hidden" name="{{ form.idOpt.name }}" value="{{ idOpt }}">
+        <div class="tbl-content">
+            {{ form.option_text.label }}
+            {{ form.option_text }}
+        </div>
+
+        <div class ="tbl-content">
+            {{ form.is_correct.label }}
+            {{ form.is_correct(value=i,checked=False) }}
+        </div>
+        {% endfor %}
+
+        <input type="submit" value="Done">
+    </form>
+</div>
+{% endblock %}

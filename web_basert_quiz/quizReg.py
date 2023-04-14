@@ -85,6 +85,49 @@ class QuizReg:
             result = None
         return result
 
+    def getLastQuestId(self):
+        try:
+            self.cursor.execute("SELECT * FROM Questions ORDER BY idQuest DESC LIMIT 1;")
+            result = self.cursor.fetchone()
+        except mysql.connector.Error as err:
+            print(err)
+            result = None
+        return result
+
+    def addResult(self, user_id, quiz_id, score, totalt):
+        try:
+            sql1 = "INSERT INTO Results (user_id, quiz_id, correct_answers, total_questions) VALUES (%s, %s, %s, %s)"
+            values = (user_id, quiz_id, score, totalt)
+            self.cursor.execute(sql1, values)
+            self.conn.commit()
+            print("Quiz result added successfully")
+        except mysql.connector.Error as err:
+            self.conn.rollback()
+            print("Error adding quiz result:", err)
+    
+    
+    def addQuestion(self,quiz_id, question_text, category):
+        try:
+            sql1 = "INSERT INTO Questions (quiz_id, question_text, category) VALUES (%s, %s, %s)"
+            values = (quiz_id, question_text, category)
+            self.cursor.execute(sql1,values)
+            self.conn.commit()
+            print("Question added successfully")
+        except mysql.connector.Error as err:
+            self.conn.rollback()
+            print("Error adding question into Quiz:", err)
+
+    def addOptions(self,quest_id, option_text, is_correct):
+        try:
+            sql1 = "INSERT INTO Options (quest_id, option_text, is_correct) VALUES (%s, %s, %s)"
+            values = (quest_id, option_text, is_correct)
+            self.cursor.execute(sql1,values)
+            self.conn.commit()
+            print("Question added successfully")
+        except mysql.connector.Error as err:
+            self.conn.rollback()
+            print("Error adding question into Quiz:", err)
+
 
     def updateQuestion(self, question_id,quiz_id, question_text, category):
         try:
@@ -112,3 +155,4 @@ class QuizReg:
         except mysql.connector.Error as err:
             self.conn.rollback()
             print("Error updating question:", err)
+

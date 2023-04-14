@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, TextAreaField, HiddenField, BooleanField,validators,FieldList,FormField
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, SelectField, TextAreaField, HiddenField, BooleanField,validators,IntegerField
+from wtforms.validators import DataRequired,NumberRange
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -13,6 +13,7 @@ class QuestionForm(FlaskForm):
     quiz_id = HiddenField('quiz_id')
     question_text = StringField('Question Text', validators=[DataRequired()])
     category = StringField('Category', validators=[DataRequired()])
+    total_options = IntegerField('total_options', [validators.NumberRange(min=2, max=10)])
     submit = SubmitField('Update')
 
 class OptionForm(FlaskForm):

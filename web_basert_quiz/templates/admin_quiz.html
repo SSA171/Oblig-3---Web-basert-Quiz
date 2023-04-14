@@ -36,6 +36,9 @@
         {% endfor %}
         {{ questionForm.submit }}
     </form>
+    <button>
+        <a href="{{ url_for('add', quiz_id=quiz_id) }}">Add question</a>
+    </button>
 </div>
 {% endif %}
 {% endblock %}

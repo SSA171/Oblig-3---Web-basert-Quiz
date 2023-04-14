@@ -17,6 +17,7 @@ login_manager.login_view = 'login'
 
 # Define the User Loader function for Flask-Login
 
+
 @login_manager.user_loader
 def load_user(id):
     with UserReg() as db:
@@ -34,6 +35,7 @@ def index():
     return redirect(url_for('login'))
 
 # Define the login route
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -57,6 +59,7 @@ def login():
         flash('Invalid username or password')
     return render_template('login.html', the_title='Login page', form=form)
 
+
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
@@ -67,18 +70,19 @@ def admin():
             if quiz_id is None:
                 return redirect(url_for('admin'))
             return redirect(url_for('admin_tool', quiz_id=quiz_id))
-        
+
         with QuizReg() as db:
             quiz_list = db.getAllQuiz()
-        return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list,form=form)
+        return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list, form=form)
     return redirect(url_for(index))
+
 
 @app.route('/admin/tool', methods=['GET', 'POST'])
 @login_required
 def admin_tool():
     if current_user.account_type != 'administrator':
         return redirect(url_for(index))
-    
+
     quiz_id = request.args.get('quiz_id')
     form = QuestionForm()
     if request.method == 'POST':
@@ -88,8 +92,9 @@ def admin_tool():
         elif quiz_tool == 'edit':
             return redirect(url_for('update', quiz_id=quiz_id, ))
         else:
-            return redirect(url_for('result_quiz', quiz_id=quiz_id))
-    return render_template('admin_quiz_tool.html', the_title="Quiz Tool page", quiz_id = quiz_id, form = form)
+            return redirect(url_for('result_question', quiz_id=quiz_id))
+    return render_template('admin_quiz_tool.html', the_title="Quiz Tool page", quiz_id=quiz_id, form=form)
+
 
 @app.route('/update', methods=['GET', 'POST'])
 @login_required
@@ -116,7 +121,7 @@ def update():
         option_text = request.form.getlist('option_text')
         is_correct = request.form.getlist('is_correct')
         data = {}
-        
+
         for i in range(len(idQuest)):
             question_id = idQuest[i]
             if question_id not in data:
@@ -129,8 +134,8 @@ def update():
             option = {
                 'idOpt': idOpt[i],
                 'option_text': option_text[i],
-                #må debugge denne delen ettersom den blir ikke oppdatert 
-                #sjekk print statement i for option_data in question_data
+                # må debugge denne delen ettersom den blir ikke oppdatert
+                # sjekk print statement i for option_data in question_data
                 'is_correct': int(idOpt[i] in is_correct)
             }
             data[question_id]['options'].append(option)
@@ -146,35 +151,84 @@ def update():
                     print(option_data['is_correct'])
                     db.updateOption(
                         option_id=option_data['idOpt'],
-                        quest_id =question_id,
+                        quest_id=question_id,
                         option_text=option_data['option_text'],
                         is_correct=option_data['is_correct']
                     )
     return render_template('admin_quiz.html', the_title='Quiz update', questions=questions, options=options, questionForm=questionForm, optionForm=optionForm, quiz_id=quiz_id)
 
-@app.route('/result_question', methods=['GET','POST'])
+
+@app.route('/add', methods=['GET', 'POST'])
+@login_required
+def add():
+    if current_user.account_type != 'administrator':
+        return redirect(url_for('index'))
+
+    quiz_id = request.args.get('quiz_id')
+    form = QuestionForm()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        question_text = request.form.get('question_text')
+        category = request.form.get('category')
+        total_options = request.form.get('total_options')
+        with QuizReg() as db:
+            db.addQuestion(quiz_id, question_text, category)
+
+        return redirect(url_for('add_options', quiz_id=quiz_id, total_options=total_options))
+    return render_template('admin_add.html', the_title='Add questions', form=form, quiz_id=quiz_id)
+
+
+@app.route('/add_options', methods=['GET', 'POST'])
+@login_required
+def add_options():
+    if current_user.account_type != 'administrator':
+        return redirect(url_for('index'))
+
+    quiz_id = request.args.get('quiz_id')
+    total_options = request.args.get('total_options')
+    form = OptionForm()
+    with QuizReg() as db:
+        quest_id = db.getLastQuestId()
+        quest_id = quest_id[0]
+
+    if request.method == 'POST' and form.validate_on_submit():
+        option_text = request.form.getlist('option_text')
+        is_correct = request.form.get('is_correct')
+        with QuizReg() as db:
+            for i in range(len(option_text)):
+                if i == int(is_correct):
+                    db.addOptions(quest_id, option_text[i], '1')
+                else:
+                    db.addOptions(quest_id, option_text[i], '0')
+            return 'done'
+    return render_template('admin_add_options.html', the_title='Add options', form=form, quiz_id=quiz_id, total_options=int(total_options), quest_id=quest_id)
+
+
+@app.route('/result_question', methods=['GET', 'POST'])
 @login_required
 def result_question():
     if current_user.account_type != 'administrator':
         return redirect(url_for('index'))
-    
+
     with QuizReg() as db:
         quiz_id = request.args.get('quiz_id')
         quiz = db.getQuizId(quiz_id)
         quiz_title = quiz[1]
         results = db.getResultsAll(quiz_id)
-        
+
     for result in results:
         with UserReg() as db:
             user = db.getId(result[1])
             username = user[1]
-    return render_template('admin_results.html', the_title=quiz_title, results = results, username = username)
-    
+    return render_template('admin_results.html', the_title=quiz_title, results=results, username=username)
 
+
+# user sine ting
 
 @app.route('/quiz', methods=['GET', 'POST'])
 @login_required
 def quiz():
+    form = QuestionForm()
     if request.method == 'POST':
         quiz_id = request.form.get('quiz_id')
         if quiz_id is None:
@@ -183,27 +237,33 @@ def quiz():
     else:
         with QuizReg() as db:
             quiz_list = db.getAllQuiz()
-    return render_template('quiz_home.html', the_title="Quiz page", quiz_list=quiz_list)
+    return render_template('quiz_home.html', the_title="Quiz page", quiz_list=quiz_list, form=form)
 
 
 @app.route('/doquiz', methods=['GET', 'POST'])
 @login_required
 def do_quiz():
+    form = QuestionForm()
     if request.method == 'POST':
         quiz_id = request.args.get('quiz_id')
         totalt = request.args.get('totalt')
+        user_id = current_user.id
         # Evaluate quiz and show results
         user_answers = request.form.to_dict()
+        del user_answers['csrf_token']
+        print(user_answers)
         score = 0
-        
+
         for key in user_answers:
             idOpt = user_answers[key]
             with QuizReg() as db:
                 answer = db.getOptId(idOpt)
             if answer[3] == 1:
                 score += 1
-        return render_template('results.html', score=score, totalt=totalt)
-    
+        with QuizReg() as db:
+            db.addResult(user_id, quiz_id, score, totalt)
+        return render_template('results.html', score=score, totalt=totalt, form=form)
+
     else:
         # Show quiz questions
         with QuizReg() as db:
@@ -215,8 +275,8 @@ def do_quiz():
             for question in questions:
                 options[question[0]] = db.getOptionsAll(question[0])
                 totalt += 1
-        return render_template('quiz.html', the_title=quiz_title[1], quiz_id=quiz_id, questions=questions, options=options, totalt=totalt)
-    
+        return render_template('quiz.html', the_title=quiz_title[1], quiz_id=quiz_id, questions=questions, options=options, totalt=totalt, form=form)
+
 
 # Define the logout route
 
