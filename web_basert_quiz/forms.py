@@ -17,6 +17,7 @@ class QuestionForm(FlaskForm):
 
 class OptionForm(FlaskForm):
     idOpt = HiddenField('idOpt')
+    quest_id = HiddenField('quest_id')
     option_text = StringField('Option Text', validators=[DataRequired()])
-    is_correct = BooleanField('Is Correct?')
+    is_correct = BooleanField('is_correct')
     submit = SubmitField('Update')

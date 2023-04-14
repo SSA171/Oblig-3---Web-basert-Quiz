@@ -24,11 +24,11 @@
             </div>
             {% for option in options[question[0]] %}
             <div>
-                <input type="hidden" id="idOpt" name="{{ optionForm.idOpt.name }}" value="{{ option[0] }}">
+                <input type="hidden" name="{{ optionForm.idOpt.name }}" value="{{ option[0] }}">
+                <input type="hidden" name="{{ optionForm.quest_id.name }}" value="{{ option[1] }}">
                 <label>Option {{ loop.index }}:</label>
                 <br><br>
-                <input type="checkbox" name="{{ optionForm.is_correct.name }}" value="{{ option[3] }}" {% if
-                    option[3]==1 %}checked{% endif %}>
+                <input type="checkbox" name="{{ optionForm.is_correct.name }}" value="{{ option[0] }}" {% if option[3] %}checked{% endif %}>
                 <input type="text" name="{{ optionForm.option_text.name }}" value="{{ option[2] }}">
             </div>
             {% endfor %}

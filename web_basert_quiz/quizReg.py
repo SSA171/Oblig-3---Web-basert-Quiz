@@ -86,24 +86,29 @@ class QuizReg:
         return result
 
 
-    def updateQuestion(self, idQuest, question_text, quiz_id):
+    def updateQuestion(self, question_id,quiz_id, question_text, category):
         try:
-            sql = "UPDATE Questions SET question_text = %s WHERE idQuest = %s AND quiz_id = %s "
+            sql1 = "UPDATE Questions SET question_text = %s, category = %s WHERE idQuest = %s AND quiz_id =%s"
         
-            self.cursor.execute(sql, (question_text, idQuest))
+            self.cursor.execute(sql1, (question_text, category, question_id, quiz_id))
             
-            self.db.commit()
+            self.conn.commit()
             
             print("Question updated successfully")
             
         except mysql.connector.Error as err:
-            self.db.rollback()
+            self.conn.rollback()
             print("Error updating question:", err)
 
-
-    def updateOption(self, option_id, option_text, is_correct):
+    def updateOption(self, option_id,quest_id, option_text, is_correct):
         try:
-            self.cursor.execute("UPDATE Options SET option_text = %s, is_correct = %s WHERE idOpt = %s", (option_text, is_correct, option_id))
-            self.db.commit()
+            sql1 = "UPDATE Options SET option_text = %s, is_correct = %s WHERE idOpt = %s AND quest_id = %s"
+            self.cursor.execute(sql1, (option_text, is_correct, option_id,quest_id))
+            
+            self.conn.commit()
+            
+            print("Question updated successfully")
+        
         except mysql.connector.Error as err:
-            print(err)
+            self.conn.rollback()
+            print("Error updating question:", err)

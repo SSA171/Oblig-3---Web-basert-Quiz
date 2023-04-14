@@ -107,31 +107,50 @@ def update():
             idQuest = question[0]
             options[idQuest] = db.getOptionsAll(idQuest)
 
-    if request.method == 'POST':
-        question_changes = []
-        option_changes = []
-        for question in questions:
-            question_id = request.form.get(f"idQuest_{question[0]}")
-            question_text = request.form.get(f"question_text_{question[0]}")
-            category = request.form.get(f"category_{question[0]}")
-            if question_text != question[2] or category != question[3]:
-                question_changes.append((question_id, question[2], question_text, question[3], category))
-                #db.updateQuestion(question_id, question_text, category)
-            for option in options[question[0]]:
-                option_id = option[0]
-                option_text = request.form.get(f"option_text_{option_id}")
-                is_correct = request.form.get(f"is_correct_{option_id}")
-                if option_text != option[2] or is_correct != option[3]:
-                    option_changes.append((option_id, option[2], option_text, option[3], is_correct))
-                    #db.updateOption(option_id, option_text, is_correct)
-
-        print(f"Question changes: {question_changes}")
-        print(f"Option changes: {option_changes}")
-
+    if request.method == 'POST' and questionForm.validate_on_submit():
+        idQuest = request.form.getlist('idQuest')
+        question_text = request.form.getlist('question_text')
+        category = request.form.getlist('category')
+        quest_id = request.form.getlist('quest_id')
+        idOpt = request.form.getlist('idOpt')
+        option_text = request.form.getlist('option_text')
+        is_correct = request.form.getlist('is_correct')
+        data = {}
+        
+        for i in range(len(idQuest)):
+            question_id = idQuest[i]
+            if question_id not in data:
+                data[question_id] = {
+                    'quiz_id': quiz_id,
+                    'question_text': question_text[i],
+                    'category': category[i],
+                    'options': []
+                }
+            option = {
+                'idOpt': idOpt[i],
+                'option_text': option_text[i],
+                #må debugge denne delen ettersom den blir ikke oppdatert 
+                #sjekk print statement i for option_data in question_data
+                'is_correct': int(idOpt[i] in is_correct)
+            }
+            data[question_id]['options'].append(option)
+        with QuizReg() as db:
+            for question_id, question_data in data.items():
+                db.updateQuestion(
+                    question_id=question_id,
+                    quiz_id=question_data['quiz_id'],
+                    question_text=question_data['question_text'],
+                    category=question_data['category']
+                )
+                for option_data in question_data['options']:
+                    print(option_data['is_correct'])
+                    db.updateOption(
+                        option_id=option_data['idOpt'],
+                        quest_id =question_id,
+                        option_text=option_data['option_text'],
+                        is_correct=option_data['is_correct']
+                    )
     return render_template('admin_quiz.html', the_title='Quiz update', questions=questions, options=options, questionForm=questionForm, optionForm=optionForm, quiz_id=quiz_id)
-
-
-
 
 @app.route('/result_question', methods=['GET','POST'])
 @login_required
