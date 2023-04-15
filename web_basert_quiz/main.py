@@ -55,7 +55,7 @@ def login():
             if current_user.account_type == 'administrator':
                 return redirect(url_for('admin'))
             else:
-                return redirect(url_for('quiz'))
+                return redirect(url_for('quiz_select'))
         flash('Invalid username or password')
     return render_template('login.html', the_title='Login page', form=form)
 
@@ -263,59 +263,97 @@ def result_question():
     return render_template('admin_results.html', the_title=quiz_title, results=results, username=username)
 
 
+
 # user sine ting
 
-@app.route('/quiz', methods=['GET', 'POST'])
+@app.route('/quiz_select', methods=['GET', 'POST'])
 @login_required
-def quiz():
-    form = QuestionForm()
-    if request.method == 'POST':
+def quiz_select():
+    form = QuizForm()
+    if request.method == 'POST':   
         quiz_id = request.form.get('quiz_id')
         if quiz_id is None:
-            return redirect(url_for('quiz'))
-        return redirect(url_for('do_quiz', quiz_id=quiz_id))
+            return redirect(url_for('quiz_select'))
+        return redirect(url_for('quiz', quiz_id=quiz_id))
     else:
         with QuizReg() as db:
             quiz_list = db.getAllQuiz()
     return render_template('quiz_home.html', the_title="Quiz page", quiz_list=quiz_list, form=form)
 
 
-@app.route('/doquiz', methods=['GET', 'POST'])
+@app.route('/quiz', methods=['GET','POST'])
+@login_required
+def quiz():
+    if current_user.account_type != 'user':
+        return redirect(url_for('index'))
+    
+    with QuizReg() as db:
+        quiz_id = request.args.get('quiz_id')
+        questions = db.getQuestionAll(quiz_id)
+        questions_dict = {}
+        
+        for i in range(len(questions)):
+            idQuest = str(questions[i][0])
+            if idQuest not in questions_dict:
+                questions_dict[idQuest] = {
+                    'question_text': questions[i][2],
+                    'category': questions[i][3],
+                    'options': []
+                }
+            options = db.getOptionsAll(idQuest)
+            
+            for j in range(len(options)):
+                option = {
+                    'idOpt' : str(options[j][0]),
+                    'quest_id': options[j][1],
+                    'option_text': options[j][2],
+                    'is_correct': options[j][3]
+                }
+                questions_dict[idQuest]['options'].append(option)
+        first_question_id = list(questions_dict.keys())[0]
+        session["questions"] = questions_dict
+        session["options"] = {}
+        session["score"] = 0
+        for question in questions_dict:
+            session["options"][question] = questions_dict[question]['options']
+    return render_template('quiz.html',quiz_id = quiz_id, question=session["questions"][first_question_id]["question_text"], options=session["options"][first_question_id], question_number = first_question_id,form=QuestionForm())
+
+
+@app.route('/do_quiz2', methods=['GET','POST'])
 @login_required
 def do_quiz():
-    form = QuestionForm()
-    if request.method == 'POST':
-        quiz_id = request.args.get('quiz_id')
-        totalt = request.args.get('totalt')
-        user_id = current_user.id
-        # Evaluate quiz and show results
-        user_answers = request.form.to_dict()
-        del user_answers['csrf_token']
-        print(user_answers)
-        score = 0
+    if current_user.account_type != 'user':
+        return redirect(url_for('index'))
 
-        for key in user_answers:
-            idOpt = user_answers[key]
-            with QuizReg() as db:
-                answer = db.getOptId(idOpt)
-            if answer[3] == 1:
-                score += 1
-        with QuizReg() as db:
-            db.addResult(user_id, quiz_id, score, totalt)
-        return render_template('results.html', score=score, totalt=totalt, form=form)
+    quiz_id = request.args.get('quiz_id')
+    questions = session['questions']
+    options = session['options']
+    current_question_number = int(request.form['question_number'])
+    answers = request.form.getlist('answers')
 
-    else:
-        # Show quiz questions
+    # Check the answer and update the score
+    current_question = questions[str(current_question_number)]
+    current_options = options[str(current_question_number)]
+    for answer in answers:
+        if current_options[int(answer)-1]['is_correct']:
+            session['score'] += 1
+
+    # Move to the next question or end the quiz
+    if current_question_number == len(questions):
+        totalt = current_question_number
         with QuizReg() as db:
-            quiz_id = request.args.get('quiz_id')
-            questions = db.getQuestionAll(quiz_id)
-            quiz_title = db.getQuizId(quiz_id)
-            options = {}
-            totalt = 0
-            for question in questions:
-                options[question[0]] = db.getOptionsAll(question[0])
-                totalt += 1
-        return render_template('quiz.html', the_title=quiz_title[1], quiz_id=quiz_id, questions=questions, options=options, totalt=totalt, form=form)
+            db.addResult(int(current_user.id),quiz_id, session['score'], totalt)
+        return render_template('results.html', score = session['score'], totalt = totalt )
+
+    next_question_number = current_question_number + 1
+    next_question = questions[str(next_question_number)]
+
+    return render_template('quiz.html',
+                           quiz_id=quiz_id,
+                           question_number=next_question_number,
+                           question=next_question['question_text'],
+                           options=options[str(next_question_number)],
+                           form=QuestionForm())
 
 
 # Define the logout route
