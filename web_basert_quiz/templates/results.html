@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% block body %}
+{% if current_user.is_authenticated %}
     <h1>{{ the_title }}</h1>
     <div class="home">
     <h1>Your score is {{ score }} out of {{ totalt }}.</h1>
-    <a href="{{ url_for('quiz') }}"><button>New Quiz</button></a>
+    <a href="{{ url_for('quiz_select') }}"><button>New Quiz</button></a>
     </div>
+    {%endif%}
 {% endblock %}
 

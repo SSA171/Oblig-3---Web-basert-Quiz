@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
+{% if current_user.is_authenticated %}
 <div class="home">
 <h1>Quiz!</h1>
 <form method="POST" action="{{ url_for('do_quiz', quiz_id=quiz_id) }}">
@@ -17,4 +18,5 @@
   <input type="submit" value=" Next ">
 </form>
 </div>
+{%endif%}
 {% endblock %}

@@ -1,6 +1,7 @@
-{% extends 'base.html' %}
 
+{% extends 'base.html' %}
 {% block body %}
+{% if current_user.is_authenticated %}
 <div class="quiz">
     <h1>{{the_title}}</h1>
     <form method="POST" action="{{ url_for('add_options', quiz_id = quiz_id, total_options = total_options) }}">
@@ -14,7 +15,7 @@
             {{ form.option_text }}
         </div>
 
-        <div class ="tbl-content">
+        <div class="tbl-content">
             {{ form.is_correct.label }}
             {{ form.is_correct(value=i,checked=False) }}
         </div>
@@ -23,4 +24,5 @@
         <input type="submit" value="Done">
     </form>
 </div>
+{%endif}
 {% endblock %}

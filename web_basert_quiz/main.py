@@ -263,14 +263,13 @@ def result_question():
     return render_template('admin_results.html', the_title=quiz_title, results=results, username=username)
 
 
-
 # user sine ting
 
 @app.route('/quiz_select', methods=['GET', 'POST'])
 @login_required
 def quiz_select():
     form = QuizForm()
-    if request.method == 'POST':   
+    if request.method == 'POST':
         quiz_id = request.form.get('quiz_id')
         if quiz_id is None:
             return redirect(url_for('quiz_select'))
@@ -281,17 +280,20 @@ def quiz_select():
     return render_template('quiz_home.html', the_title="Quiz page", quiz_list=quiz_list, form=form)
 
 
-@app.route('/quiz', methods=['GET','POST'])
+@app.route('/quiz', methods=['GET', 'POST'])
 @login_required
 def quiz():
     if current_user.account_type != 'user':
         return redirect(url_for('index'))
-    
+
     with QuizReg() as db:
         quiz_id = request.args.get('quiz_id')
         questions = db.getQuestionAll(quiz_id)
         questions_dict = {}
-        
+
+        if len(questions) < 1:
+            return 'This quiz is not done'
+
         for i in range(len(questions)):
             idQuest = str(questions[i][0])
             if idQuest not in questions_dict:
@@ -301,10 +303,9 @@ def quiz():
                     'options': []
                 }
             options = db.getOptionsAll(idQuest)
-            
             for j in range(len(options)):
                 option = {
-                    'idOpt' : str(options[j][0]),
+                    'idOpt': str(options[j][0]),
                     'quest_id': options[j][1],
                     'option_text': options[j][2],
                     'is_correct': options[j][3]
@@ -316,10 +317,10 @@ def quiz():
         session["score"] = 0
         for question in questions_dict:
             session["options"][question] = questions_dict[question]['options']
-    return render_template('quiz.html',quiz_id = quiz_id, question=session["questions"][first_question_id]["question_text"], options=session["options"][first_question_id], question_number = first_question_id,form=QuestionForm())
+    return render_template('quiz.html', quiz_id=quiz_id, question=session["questions"][first_question_id]["question_text"], options=session["options"][first_question_id], question_number=first_question_id, form=QuestionForm())
 
 
-@app.route('/do_quiz2', methods=['GET','POST'])
+@app.route('/do_quiz2', methods=['GET', 'POST'])
 @login_required
 def do_quiz():
     if current_user.account_type != 'user':
@@ -342,8 +343,9 @@ def do_quiz():
     if current_question_number == len(questions):
         totalt = current_question_number
         with QuizReg() as db:
-            db.addResult(int(current_user.id),quiz_id, session['score'], totalt)
-        return render_template('results.html', score = session['score'], totalt = totalt )
+            db.addResult(int(current_user.id), quiz_id,
+                         session['score'], totalt)
+        return render_template('results.html', score=session['score'], totalt=totalt)
 
     next_question_number = current_question_number + 1
     next_question = questions[str(next_question_number)]
