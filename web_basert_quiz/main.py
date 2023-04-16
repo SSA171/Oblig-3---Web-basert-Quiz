@@ -74,6 +74,7 @@ def admin():
     if request.method == 'POST':
         if quiz_id is None:
             return redirect(url_for('admin', quiz_id=quiz_id))
+        return redirect(url_for('admin_tool', quiz_id=quiz_id))
 
     return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list, form=form, quiz_id=quiz_id)
 
@@ -352,8 +353,7 @@ def do_quiz():
         with QuizReg() as db:
             quest_id = current_options[int(answer)-1]['quest_id']
             idOpt = current_options[int(answer)-1]['idOpt']
-            idUser = current_user.id
-            db.addUserAnswer(quest_id, idOpt, idUser)
+            session.setdefault('user_answers', []).append([quest_id, idOpt])
 
         if current_options[int(answer)-1]['is_correct']:
             session['score'] += 1
@@ -364,6 +364,14 @@ def do_quiz():
         with QuizReg() as db:
             db.addResult(int(current_user.id), quiz_id,
                          session['score'], totalt)
+
+            idResults = db.getLastResultId()
+            idResults = idResults[0]
+
+            for user_answer in session.get('user_answers', []):
+                db.addUserAnswer(user_answer[0], user_answer[1], int(
+                    current_user.id), idResults)
+
         return render_template('results.html', score=session['score'], totalt=totalt)
 
     next_question_number = current_question_number + 1

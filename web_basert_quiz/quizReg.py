@@ -112,6 +112,16 @@ class QuizReg:
             result = None
         return result
 
+    def getLastResultId(self):
+        try:
+            self.cursor.execute(
+                "SELECT * FROM Results ORDER BY idResults DESC LIMIT 1;")
+            result = self.cursor.fetchone()
+        except mysql.connector.Error as err:
+            print(err)
+            result = None
+        return result
+
     def addResult(self, user_id, quiz_id, score, totalt):
         try:
             sql1 = "INSERT INTO Results (user_id, quiz_id, correct_answers, total_questions) VALUES (%s, %s, %s, %s)"
@@ -156,10 +166,10 @@ class QuizReg:
             self.conn.rollback()
             print(err)
 
-    def addUserAnswer(self, quest_id, idOpt, idUser):
+    def addUserAnswer(self, quest_id, idOpt, idUser, idResults):
         try:
-            sql1 = "INSERT INTO User_answers (quest_id, idOpt,idUser) VALUES (%s, %s,%s)"
-            values = (quest_id, idOpt, idUser)
+            sql1 = "INSERT INTO User_answers (quest_id, idOpt,idUser,idResults) VALUES (%s, %s,%s,%s)"
+            values = (quest_id, idOpt, idUser,idResults)
             self.cursor.execute(sql1, values)
             self.conn.commit()
             print("User answer added successfully")
