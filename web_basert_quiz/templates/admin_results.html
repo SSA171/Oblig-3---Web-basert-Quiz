@@ -1,35 +1,43 @@
 {% extends 'base.html' %}
 
 {% block body %}
-{% if current_user.is_authenticated %}
-  <h1>{{the_title}} results</h1>
-  <div class = "result">
-  <div class="tbl-header">
-  <table>
-    <thead>
-      <tr>
-        <th> Username </th>
-        <th> Quiz title </th>
-        <th> Correct Answers </th>
-        <th> Total Questions </th>
-      </tr>
-    </thead>
-  </table>
-  <div class="tbl-content">
-    <table>
-    <tbody>
-      {% for result in results %}
-        <tr>
-          <td> {{ username }} </td>
-          <td> {{ the_title }} </td>
-          <td> {{ result[3] }} </td>
-          <td> {{ result[4] }} </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  </div>
-  </div>
-  {%endif%}
+  {% if current_user.is_authenticated %}
+    <h1>{{ the_title }} Results</h1>
+    <div class="result">
+      <div class="tbl-header">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Quiz Title</th>
+              <th>Correct Answers</th>
+              <th>Total Questions</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="tbl-content">
+        <table>
+          <tbody>
+            {% for result in results %}
+              <tr>
+                <td>{{ username }}</td>
+                <td>{{ the_title }}</td>
+                <td>{{ result[3] }}</td>
+                <td>{{ result[4] }}</td>
+              </tr>
+              {% for answer in user_answers[result[0]] %}
+                <tr>
+                  <td>{{ answer[1] }}</td>
+                  <td>{{ answer[2] }}</td>
+                  <td>{{ answer[3] }}</td>
+                  <td>{{ answer[4] }}</td>
+                </tr>
+              {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

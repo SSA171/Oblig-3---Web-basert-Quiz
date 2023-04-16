@@ -5,6 +5,7 @@
     <div class="home">
     <h1>Your score is {{ score }} out of {{ totalt }}.</h1>
     <a href="{{ url_for('quiz_select') }}"><button>New Quiz</button></a>
+    <a href="{{ url_for('logout') }}"><button>Log out</button></a>
     </div>
     {%endif%}
 {% endblock %}

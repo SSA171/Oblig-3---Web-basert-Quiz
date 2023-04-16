@@ -254,13 +254,21 @@ def result_question():
         quiz_id = request.args.get('quiz_id')
         quiz = db.getQuizId(quiz_id)
         quiz_title = quiz[1]
+        questions = db.getQuestionAll
         results = db.getResultsAll(quiz_id)
+        user_answers = {}
 
     for result in results:
         with UserReg() as db:
             user = db.getId(result[1])
             username = user[1]
-    return render_template('admin_results.html', the_title=quiz_title, results=results, username=username)
+            idResult = result[0]
+
+        with QuizReg() as db:
+            user_answer = db.getUserAnswersAll(idResult)
+            user_answers[idResult] = user_answer
+
+    return render_template('admin_results.html', the_title=quiz_title, results=results, username=username, user_answers=user_answers)
 
 
 # user sine ting
@@ -335,7 +343,14 @@ def do_quiz():
     # Check the answer and update the score
     current_question = questions[str(current_question_number)]
     current_options = options[str(current_question_number)]
+
     for answer in answers:
+        with QuizReg() as db:
+            quest_id = current_options[int(answer)-1]['quest_id']
+            idOpt = current_options[int(answer)-1]['idOpt']
+            idUser = current_user.id
+            db.addUserAnswer(quest_id, idOpt, idUser)
+
         if current_options[int(answer)-1]['is_correct']:
             session['score'] += 1
 

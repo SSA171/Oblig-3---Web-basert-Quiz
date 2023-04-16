@@ -84,6 +84,15 @@ class QuizReg:
             print(err)
             result = None
         return result
+    
+    def getUserAnswersAll(self, idResult):
+        try:
+            self.cursor.execute("SELECT * FROM User_answers WHERE idResults =(%s)", (idResult,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as err:
+            print(err)
+            result = None
+        return result
 
     def getLastQuestId(self):
         try:
@@ -134,6 +143,17 @@ class QuizReg:
             self.cursor.execute(sql1,values)
             self.conn.commit()
             print("Question added successfully")
+        except mysql.connector.Error as err:
+            self.conn.rollback()
+            print(err)
+
+    def addUserAnswer(self, quest_id, idOpt,idUser):
+        try:
+            sql1 = "INSERT INTO User_answers (quest_id, idOpt,idUser) VALUES (%s, %s,%s)"
+            values = (quest_id, idOpt,idUser)
+            self.cursor.execute(sql1,values)
+            self.conn.commit()
+            print("User answer added successfully")
         except mysql.connector.Error as err:
             self.conn.rollback()
             print(err)
