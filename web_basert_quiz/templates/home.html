@@ -1,7 +1,0 @@
-{% extends 'base.html' %}
-{% block body %}
-{% if current_user.is_authenticated %}
-  <h1>Hi {{ current_user.username }}!</h1>
-  <h2>score is {{score}}</h2>
-{% endif %}
-{% endblock %}

@@ -63,21 +63,22 @@ def login():
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
-    if current_user.account_type == 'administrator':
-        form = QuestionForm()
-        if request.method == 'POST':
-            quiz_id = request.form.get('quiz_id')
-            if quiz_id is None:
-                return redirect(url_for('admin'))
-            return redirect(url_for('admin_tool', quiz_id=quiz_id))
+    if current_user.account_type != 'administrator':
+        return redirect(url_for(index))
 
-        with QuizReg() as db:
-            quiz_list = db.getAllQuiz()
-        return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list, form=form)
-    return redirect(url_for(index))
+    form = QuestionForm()
+    quiz_id = request.form.get('quiz_id')
+    with QuizReg() as db:
+        quiz_list = db.getAllQuiz()
+
+    if request.method == 'POST':
+        if quiz_id is None:
+            return redirect(url_for('admin', quiz_id=quiz_id))
+
+    return render_template('admin_quiz_select.html', the_title="Quiz select page", quiz_list=quiz_list, form=form, quiz_id=quiz_id)
 
 
-@app.route('/admin/tool', methods=['GET', 'POST'])
+@app.route('/tool', methods=['GET', 'POST'])
 @login_required
 def admin_tool():
     if current_user.account_type != 'administrator':
@@ -208,6 +209,9 @@ def delete():
     with QuizReg() as db:
         questions = db.getQuestionAll(quiz_id)
 
+    if len(questions) < 1:
+        return redirect(url_for('admin', quiz_id=quiz_id))
+
     if request.method == 'POST':
         idQuest = request.form.get('idQuest')
         if quiz_id is None:
@@ -215,7 +219,7 @@ def delete():
         with QuizReg() as db:
             db.deleteQuestion(idQuest)
             questions = db.getQuestionAll(quiz_id)
-    return render_template('admin_delete.html', the_title="Question delete page", questions=questions, form=form)
+    return render_template('admin_delete.html', the_title="Question delete page", questions=questions, form=form, quiz_id=quiz_id)
 
 
 @app.route('/add_options', methods=['GET', 'POST'])
@@ -328,7 +332,7 @@ def quiz():
     return render_template('quiz.html', quiz_id=quiz_id, question=session["questions"][first_question_id]["question_text"], options=session["options"][first_question_id], question_number=first_question_id, form=QuestionForm())
 
 
-@app.route('/do_quiz2', methods=['GET', 'POST'])
+@app.route('/do_quiz', methods=['GET', 'POST'])
 @login_required
 def do_quiz():
     if current_user.account_type != 'user':
